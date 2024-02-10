@@ -1,21 +1,104 @@
-{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
-%}
-<h1 align="center">Notes</h1>
-<ul class="list-group list-group-flush" id="notes">
-  {% for note in user.notes %}
-  <li class="list-group-item">
-    {{ note.data }}
-    <button type="button" class="close" onClick="deleteNote({{ note.id }})">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </li>
-  {% endfor %}
-</ul>
-<form method="POST">
-  <textarea name="note" id="note" class="form-control"></textarea>
-  <br />
-  <div align="center">
-    <button type="submit" class="btn btn-primary">Add Note</button>
-  </div>
-</form>
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content %}
+    {% if user.role == "darbuotojas" %}
+
+
+        <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+        <div class="container">
+            <div class="row"><br/>
+                <div class="col text-center">
+                    <h1>Darbuotojo puslapis</h1>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="col">
+                    <div class="counter">
+                        <i class="fa fa-clock-o fa-2x"></i>
+                        <h2 class="timer count-title count-number">{{ valandos }}</h2>
+                        <p class="count-text ">Atidirbtos valandos</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="counter">
+                        <i class="fa fa-th-large fa-2x"></i>
+                        <h2 class="timer count-title count-number">{{ dezes }}</h2>
+                        <p class="count-text ">Dezes</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="counter">
+                        <i class="fa fa-money fa-2x"></i>
+                        <h2 class="timer count-title count-number">{{ atlygis }}</h2>
+                        <p class="count-text ">Atlygis</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="counter">
+                        <i class="fa  fa-address-card-o fa-2x"></i>
+                        <h2 class="timer count-title count-number">{{ ataskaitos }}</h2>
+                        <p class="count-text ">Uzpildytos ataskaitos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <br/>
+
+        <a class="btn btn-primary" href="/dienos_ataskaita">Nauja Ataskaita</a>
+    {% elif user.role == "vadybininkas" %}
+        <h1 align="center">Vadybininko puslapis</h1>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Darb. ID</th>
+                <th>Data</th>
+                <th>Valandos</th>
+                <th>Dezes</th>
+                <th>Atlygis</th>
+                <th>Patvirtinta</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for darbuotojas in darbuotojai %}
+                {% for ataskaita in darbuotojas.ataskaitos %}
+                    <tr>
+                        <td>{{ ataskaita.darbuotojo_id }}</td>
+                        <td>{{ ataskaita.data }}</td>
+                        <td>{{ ataskaita.atidirbtos_valandos }}</td>
+                        <td>{{ ataskaita.perkeltos_dezes }}</td>
+                        <td>{{ ataskaita.atlygis }}</td>
+                        <td>
+                            {% if ataskaita.patvirtinta == True %}
+                                <p style="color: green">Patvirtinta</p>
+                            {% else %}
+                                <button type="button" onClick="patvirtinti({{ ataskaita.id }})" class="btn btn-primary">
+                                    Patvirtinti
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% else %}
+        <h1 align="center">Notes</h1>
+        <ul class="list-group list-group-flush" id="notes">
+            {% for note in user.notes %}
+                <li class="list-group-item">
+                    {{ note.data }}
+                    <button type="button" class="close" onClick="console.log('hel')">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </li>
+            {% endfor %}
+        </ul>
+        <form method="POST">
+            <textarea name="note" id="note" class="form-control"></textarea>
+            <br/>
+            <div align="center">
+                <button type="submit" class="btn btn-primary">Add Note</button>
+            </div>
+        </form>
+    {% endif %}
 {% endblock %}

@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from .models import User
+from .models import User, Darbuotojas
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import db   ##means from __init__.py import db
+from . import db  ##means from __init__.py import db
 from flask_login import login_user, login_required, logout_user, current_user
-
+from passlib.hash import sha256_crypt
 
 auth = Blueprint('auth', __name__)
 
@@ -16,7 +16,7 @@ def login():
 
         user = User.query.filter_by(email=email).first()
         if user:
-            if check_password_hash(user.password, password):
+            if sha256_crypt.verify(password, user.password):
                 flash('Logged in successfully!', category='success')
                 login_user(user, remember=True)
                 return redirect(url_for('views.home'))
@@ -55,10 +55,15 @@ def sign_up():
         elif len(password1) < 7:
             flash('Password must be at least 7 characters.', category='error')
         else:
-            new_user = User(email=email, first_name=first_name, password=generate_password_hash(
-                password1, method='sha256'))
+            role = request.form.get('role')
+            new_user = User(email=email, first_name=first_name,
+                            password=sha256_crypt.encrypt(password1), role=role)
             db.session.add(new_user)
             db.session.commit()
+            if role == "darbuotojas":
+                new_darbuotojas = Darbuotojas(user_id=new_user.id)
+                db.session.add(new_darbuotojas)
+                db.session.commit()
             login_user(new_user, remember=True)
             flash('Account created!', category='success')
             return redirect(url_for('views.home'))

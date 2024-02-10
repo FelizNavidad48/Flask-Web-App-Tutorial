@@ -16,3 +16,30 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
     notes = db.relationship('Note')
+    role = db.Column(db.String(150))
+
+    user_darbuotojas_id = db.relationship('Darbuotojas')
+
+
+# Darbuotojas
+class Darbuotojas(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    ataskaitos = db.relationship('DienosAtaskaita')
+
+
+# Darbuotojo dienos ataskaita
+class DienosAtaskaita(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    darbuotojo_id = db.Column(db.Integer, db.ForeignKey('darbuotojas.id'))
+    data = db.Column(db.String(10))
+    perkeltos_dezes = db.Column(db.Integer)
+    atidirbtos_valandos = db.Column(db.Float)
+    atlygis = db.Column(db.Float, default=0.0)
+    patvirtinta = db.Column(db.Boolean, default=False)
+
+
+# Vadybininkas
+class Vadybininkas(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

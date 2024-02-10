@@ -1,7 +1,11 @@
 function deleteNote(noteId) {
-  fetch("/delete-note", {
+  print("hello");
+}
+
+function patvirtinti(ataskaitosId) {
+  fetch("/patvirtinti", {
     method: "POST",
-    body: JSON.stringify({ noteId: noteId }),
+    body: JSON.stringify({ ataskaitosId: ataskaitosId }),
   }).then((_res) => {
     window.location.href = "/";
   });
