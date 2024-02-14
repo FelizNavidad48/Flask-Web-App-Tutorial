@@ -26,3 +26,6 @@
     display: table;
     color: #4ad1e5;
 }
+.form-control:disabled{
+    background-color: transparent;
+}

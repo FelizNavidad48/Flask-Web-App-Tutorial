@@ -1,0 +1,14 @@
+{% extends "base.html" %} {% block title %}Dienos Ataskaita{% endblock %} {% block content %}
+    <h1 align="center">Dienos Ataskaita</h1>
+    <form method="POST">
+        <label for="data">Data</label>
+        <input type="date" name="data" id="data" class="form-control" value="{{ ataskaita.data }}">
+        <br />
+        <label for="darbo_valandos">Darbo val.</label>
+        <input type="number" name="darbo_valandos" id="darbo_valandos" class="form-control" value="{{ ataskaita.atidirbtos_valandos }}"></input>
+        <br />
+        <label for="deziu_kiekis">Deziu kiekis</label>
+        <input type="number" name="deziu_kiekis" id="deziu_kiekis" class="form-control" value="{{ ataskaita.perkeltos_dezes }}"></input>
+        <br />
+    </form>
+{% endblock %}

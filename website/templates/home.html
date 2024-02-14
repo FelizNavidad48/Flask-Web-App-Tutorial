@@ -45,8 +45,16 @@
 
         <a class="btn btn-primary" href="/dienos_ataskaita">Nauja Ataskaita</a>
     {% elif user.role == "vadybininkas" %}
+        </br>
         <h1 align="center">Vadybininko puslapis</h1>
-        <table class="table">
+        </br>
+        <label for="idInput">Filtruoti pagal darbuotojo Id:</label>
+        <input type="text" id="idInput" class="form-control" onblur="idFiltravimoFunkcija()" placeholder="Darbuotojo Id..">
+        </br>
+        <label for="monthInput">Filtruoti pagal menesi:</label>
+        <input type="month" id="monthInput" onchange="menesiuFiltravimoFunkcija()" class="form-control">
+        </br>
+        <table id="myTable" class="table">
             <thead>
             <tr>
                 <th>Darb. ID</th>
@@ -54,26 +62,32 @@
                 <th>Valandos</th>
                 <th>Dezes</th>
                 <th>Atlygis</th>
-                <th>Patvirtinta</th>
+                <th>Veiksmai</th>
             </tr>
             </thead>
             <tbody>
             {% for darbuotojas in darbuotojai %}
                 {% for ataskaita in darbuotojas.ataskaitos %}
                     <tr>
-                        <td>{{ ataskaita.darbuotojo_id }}</td>
-                        <td>{{ ataskaita.data }}</td>
-                        <td>{{ ataskaita.atidirbtos_valandos }}</td>
-                        <td>{{ ataskaita.perkeltos_dezes }}</td>
-                        <td>{{ ataskaita.atlygis }}</td>
+                        <td><input size="10" id="{{ 'darbId-{0:d}'.format(ataskaita.id) }}" class="form-control" style="border: none;" disabled value="{{ ataskaita.darbuotojo_id }}"></td>
+                        <td><input size="number" id="{{ 'data-{0:d}'.format(ataskaita.id) }}" class="form-control" style="border: none;" disabled value="{{ ataskaita.data }}"></td>
+                        <td><input size="number" id="{{ 'valandos-{0:d}'.format(ataskaita.id) }}" class="form-control" style="border: none;" disabled value="{{ ataskaita.atidirbtos_valandos }}"></td>
+                        <td><input size="number" id="{{ 'dezes-{0:d}'.format(ataskaita.id) }}" class="form-control" style="border: none;" disabled value="{{ ataskaita.perkeltos_dezes }}"></td>
+                        <td><input size="number" id="{{ 'atlygis-{0:d}'.format(ataskaita.id) }}" class="form-control" style="border: none;" disabled value="{{ ataskaita.atlygis }}"></td>
                         <td>
+                            <div style="display: flex; font-size: large">
                             {% if ataskaita.patvirtinta == True %}
-                                <p style="color: green">Patvirtinta</p>
+                                <sl-icon-button name="check-circle" style="color: green" label="Settings" disabled></sl-icon-button>
                             {% else %}
-                                <button type="button" onClick="patvirtinti({{ ataskaita.id }})" class="btn btn-primary">
-                                    Patvirtinti
-                                </button>
+                                <sl-icon-button name="check-circle" onClick="patvirtinti({{ ataskaita.id }})" style="color: red" label="Settings"></sl-icon-button>
                             {% endif %}
+                            {% if ataskaita.patvirtinta == True %}
+                                <sl-icon-button name="pencil-square" label="Settings" disabled></sl-icon-button>
+                            {% else %}
+                                <sl-icon-button id="{{ 'redagavimo-mygtukas-{0:d}'.format(ataskaita.id) }}" name="pencil-square" onClick="redaguoti({{ ataskaita.id }})" label="Settings"></sl-icon-button>
+                            {% endif %}
+                            <sl-icon-button name="download" onClick="parsisiusti({{ ataskaita.id }})" ></sl-icon-button>
+                            </div>
                         </td>
                     </tr>
                 {% endfor %}
