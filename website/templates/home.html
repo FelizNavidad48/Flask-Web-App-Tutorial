@@ -52,7 +52,10 @@
         <input type="text" id="idInput" class="form-control" onblur="idFiltravimoFunkcija()" placeholder="Darbuotojo Id..">
         </br>
         <label for="monthInput">Filtruoti pagal menesi:</label>
-        <input type="month" id="monthInput" onchange="menesiuFiltravimoFunkcija()" class="form-control">
+        <div style="display: flex; gap: 10px;">
+            <input type="month" id="monthInput" onchange="menesiuFiltravimoFunkcija()" class="form-control">
+            <button id="parsisiustiPagalMenesi" class="btn btn-primary" disabled onclick="">Parsisiusti</button>
+        </div>
         </br>
         <table id="myTable" class="table">
             <thead>
@@ -79,7 +82,7 @@
                             {% if ataskaita.patvirtinta == True %}
                                 <sl-icon-button name="check-circle" style="color: green" label="Settings" disabled></sl-icon-button>
                             {% else %}
-                                <sl-icon-button name="check-circle" onClick="patvirtinti({{ ataskaita.id }})" style="color: red" label="Settings"></sl-icon-button>
+                                <sl-icon-button name="check-circle" onClick="patvirtintiAtaskaita({{ ataskaita.id }})" style="color: red" label="Settings"></sl-icon-button>
                             {% endif %}
                             {% if ataskaita.patvirtinta == True %}
                                 <sl-icon-button name="pencil-square" label="Settings" disabled></sl-icon-button>
@@ -96,23 +99,105 @@
         </table>
 
     {% else %}
-        <h1 align="center">Notes</h1>
-        <ul class="list-group list-group-flush" id="notes">
-            {% for note in user.notes %}
-                <li class="list-group-item">
-                    {{ note.data }}
-                    <button type="button" class="close" onClick="console.log('hel')">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </li>
+        <h1 align="center">Administratoriaus puslapis</h1>
+        </br>
+        <h2 align="center">Vartotoju tvirtinimas</h2>
+        </br>
+        <table id="adminTable" class="table">
+            <thead>
+            <tr>
+                <th>Vartotojo ID</th>
+                <th>Role</th>
+                <th>Vardas</th>
+                <th>Veiksmai</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for vartotojas in vartotojai %}
+                <tr>
+                    <td>{{ vartotojas.id }}</td>
+                    <td>{{ vartotojas.role.capitalize() }}</td>
+                    <td>{{ vartotojas.first_name }}</td>
+                    <td>
+                        <div style="display: flex; font-size: large">
+                            {% if vartotojas.patvirtinta == True %}
+                                <sl-icon-button name="check-circle" style="color: green" disabled></sl-icon-button>
+                            {% else %}
+                                <sl-icon-button name="check-circle" onClick="patvirtintiVartotoja({{ vartotojas.id }})" style="color: red"></sl-icon-button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
             {% endfor %}
-        </ul>
-        <form method="POST">
-            <textarea name="note" id="note" class="form-control"></textarea>
-            <br/>
-            <div align="center">
-                <button type="submit" class="btn btn-primary">Add Note</button>
-            </div>
-        </form>
+            </tbody>
+        </table>
+        </br>
+        <h2 align="center">Ataskaitu tvarkymas</h2>
+        </br>
+        <table id="myTable" class="table">
+            <thead>
+            <tr>
+                <th>Darb. ID</th>
+                <th>Data</th>
+                <th>Valandos</th>
+                <th>Dezes</th>
+                <th>Atlygis</th>
+                <th>Veiksmai</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for darbuotojas in darbuotojai %}
+                {% for ataskaita in darbuotojas.ataskaitos %}
+                    {% if ataskaita.patvirtinta == True %}
+                        <tr>
+                            <td><input size="10" id="{{ 'darbId-{0:d}'.format(ataskaita.id) }}" class="form-control" style="border: none;" disabled value="{{ ataskaita.darbuotojo_id }}"></td>
+                            <td><input size="number" id="{{ 'data-{0:d}'.format(ataskaita.id) }}" class="form-control" style="border: none;" disabled value="{{ ataskaita.data }}"></td>
+                            <td><input size="number" id="{{ 'valandos-{0:d}'.format(ataskaita.id) }}" class="form-control" style="border: none;" disabled value="{{ ataskaita.atidirbtos_valandos }}"></td>
+                            <td><input size="number" id="{{ 'dezes-{0:d}'.format(ataskaita.id) }}" class="form-control" style="border: none;" disabled value="{{ ataskaita.perkeltos_dezes }}"></td>
+                            <td><input size="number" id="{{ 'atlygis-{0:d}'.format(ataskaita.id) }}" class="form-control" style="border: none;" disabled value="{{ ataskaita.atlygis }}"></td>
+                            <td>
+                                <div style="display: flex; font-size: large">
+                                    <sl-icon-button name="check-circle" style="color: green" label="Settings" disabled></sl-icon-button>
+                                    <sl-icon-button id="{{ 'redagavimo-mygtukas-{0:d}'.format(ataskaita.id) }}" name="pencil-square" onClick="redaguoti({{ ataskaita.id }})" label="Settings"></sl-icon-button>
+                                    <sl-icon-button name="download" onClick="parsisiusti({{ ataskaita.id }})" ></sl-icon-button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <br />
+        <h2 align="center">Ikainiai</h2>
+        <br />
+        <table id="ikainiuTable" class="table">
+            <thead>
+            <tr>
+                <th>Ikainio ID</th>
+                <th>Galioja Nuo</th>
+                <th>Valandinis</th>
+                <th>Deziu kiekis</th>
+                <th>Darbuotojai</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for ikainis in ikainiai %}
+                <tr>
+                    <td>{{ ikainis.id }}</td>
+                    <td>{{ ikainis.data }}</td>
+                    <td>{{ ikainis.valandinis }}</td>
+                    <td>{{ ikainis.deziu_kiekis }}</td>
+                    <td>{% for darbuotojas in ikainis.darbuotojai %}
+                            {{ darbuotojas.id }}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <br />
+        <a class="btn btn-primary" href="/ikainis" >Naujas Ikainis</a>
+        <br />
     {% endif %}
 {% endblock %}

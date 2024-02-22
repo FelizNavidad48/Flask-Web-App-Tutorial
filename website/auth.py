@@ -16,6 +16,9 @@ def login():
 
         user = User.query.filter_by(email=email).first()
         if user:
+            if not user.patvirtinta:
+                flash('Paskyra dar nepatvirtinta', category='error')
+                return redirect(url_for('auth.login'))
             if sha256_crypt.verify(password, user.password):
                 flash('Logged in successfully!', category='success')
                 login_user(user, remember=True)
@@ -57,15 +60,20 @@ def sign_up():
         else:
             role = request.form.get('role')
             new_user = User(email=email, first_name=first_name,
-                            password=sha256_crypt.encrypt(password1), role=role)
+                            password=sha256_crypt.encrypt(password1), role=role, patvirtinta=False)
             db.session.add(new_user)
             db.session.commit()
             if role == "darbuotojas":
                 new_darbuotojas = Darbuotojas(user_id=new_user.id)
                 db.session.add(new_darbuotojas)
                 db.session.commit()
-            login_user(new_user, remember=True)
-            flash('Account created!', category='success')
-            return redirect(url_for('views.home'))
+            if role == 'administratorius':
+                new_user.patvirtinta = True
+                db.session.commit()
+                login_user(new_user, remember=True)
+                return redirect(url_for('views.home'))
+
+            flash('Paskyra sukurta, laukiama patvirtinimo', category='success')
+            return redirect(url_for('auth.login'))
 
     return render_template("sign_up.html", user=current_user)

@@ -2,8 +2,8 @@ function deleteNote(noteId) {
   print("hello");
 }
 
-function patvirtinti(ataskaitosId) {
-  fetch("/patvirtinti", {
+function patvirtintiAtaskaita(ataskaitosId) {
+  fetch("/patvirtintiAtaskaita", {
     method: "POST",
     body: JSON.stringify({ ataskaitosId: ataskaitosId }),
   }).then((_res) => {
@@ -11,6 +11,15 @@ function patvirtinti(ataskaitosId) {
   });
 }
 
+
+function patvirtintiVartotoja(vartotojoId) {
+  fetch("/patvirtintiVartotoja", {
+    method: "POST",
+    body: JSON.stringify({ vartotojoId: vartotojoId }),
+  }).then((_res) => {
+    window.location.href = "/";
+  });
+}
 function redaguoti(ataskaitosId) {
   if (document.getElementById("darbId-" + ataskaitosId).disabled) {
 
@@ -95,6 +104,12 @@ function menesiuFiltravimoFunkcija() {
   // Declare variables
   var input, filter, table, tr, td, i, txtValue;
   input = document.getElementById("monthInput");
+  if (input == null || input.value === "") {
+    document.getElementById("parsisiustiPagalMenesi").disabled = true;
+  }
+  else{
+    document.getElementById("parsisiustiPagalMenesi").disabled = false;
+  }
   filter = input.value.toUpperCase();
   table = document.getElementById("myTable");
   tr = table.getElementsByTagName("tr");
