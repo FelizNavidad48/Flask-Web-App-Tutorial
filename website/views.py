@@ -77,6 +77,7 @@ def patvirtinti_ataskaita():
     if ataskaita:
         ataskaita.patvirtinta = True
         darbuotojas = Darbuotojas.query.get(ataskaita.darbuotojo_id)
+         # Veikia tik su naujausiu ikainiu, nepaisant to kad jis gali prasidėti veliau nei dabartinė data
         if darbuotojas.dabartinis_ikainis:
             atnaujinti_atlygi(darbuotojas, Ikainis.query.get(darbuotojas.dabartinis_ikainis))
         db.session.commit()
@@ -146,6 +147,7 @@ def ikainis():
         darbuotojai = request.form.getlist('pasirinkti_darbuotojus')
         for darbuotojo_id in darbuotojai:
             darbuotojas = Darbuotojas.query.get(darbuotojo_id)
+            # Veikia tik su naujausiu ikainiu, nepaisant to kad jis gali prasidėti veliau nei dabartinė data
             if (not darbuotojas.dabartinis_ikainis or Ikainis.query.get(darbuotojas.dabartinis_ikainis).data
                     <= new_ikainis.data):
                 atnaujinti_atlygi(darbuotojas, new_ikainis)

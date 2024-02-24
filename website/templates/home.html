@@ -21,7 +21,7 @@
                     <div class="counter">
                         <i class="fa fa-th-large fa-2x"></i>
                         <h2 class="timer count-title count-number">{{ dezes }}</h2>
-                        <p class="count-text ">Dezes</p>
+                        <p class="count-text ">Dėžės</p>
                     </div>
                 </div>
                 <div class="col">
@@ -35,7 +35,7 @@
                     <div class="counter">
                         <i class="fa  fa-address-card-o fa-2x"></i>
                         <h2 class="timer count-title count-number">{{ ataskaitos }}</h2>
-                        <p class="count-text ">Uzpildytos ataskaitos</p>
+                        <p class="count-text ">Užpildytos ataskaitos</p>
                     </div>
                 </div>
             </div>
@@ -51,10 +51,10 @@
         <label for="idInput">Filtruoti pagal darbuotojo Id:</label>
         <input type="text" id="idInput" class="form-control" onblur="idFiltravimoFunkcija()" placeholder="Darbuotojo Id..">
         </br>
-        <label for="monthInput">Filtruoti pagal menesi:</label>
+        <label for="monthInput">Filtruoti pagal menesį:</label>
         <div style="display: flex; gap: 10px;">
             <input type="month" id="monthInput" onchange="menesiuFiltravimoFunkcija()" class="form-control">
-            <button id="parsisiustiPagalMenesi" class="btn btn-primary" disabled onclick="">Parsisiusti</button>
+            <button id="parsisiustiPagalMenesi" class="btn btn-primary" disabled onclick="">Parsisiųsti</button>
         </div>
         </br>
         <table id="myTable" class="table">
@@ -63,7 +63,7 @@
                 <th>Darb. ID</th>
                 <th>Data</th>
                 <th>Valandos</th>
-                <th>Dezes</th>
+                <th>Dėžės</th>
                 <th>Atlygis</th>
                 <th>Veiksmai</th>
             </tr>
@@ -101,13 +101,13 @@
     {% else %}
         <h1 align="center">Administratoriaus puslapis</h1>
         </br>
-        <h2 align="center">Vartotoju tvirtinimas</h2>
+        <h2 align="center">Vartotojų tvirtinimas</h2>
         </br>
         <table id="adminTable" class="table">
             <thead>
             <tr>
                 <th>Vartotojo ID</th>
-                <th>Role</th>
+                <th>Rolė</th>
                 <th>Vardas</th>
                 <th>Veiksmai</th>
             </tr>
@@ -132,7 +132,7 @@
             </tbody>
         </table>
         </br>
-        <h2 align="center">Ataskaitu tvarkymas</h2>
+        <h2 align="center">Ataskaitų tvarkymas</h2>
         </br>
         <table id="myTable" class="table">
             <thead>
@@ -140,7 +140,7 @@
                 <th>Darb. ID</th>
                 <th>Data</th>
                 <th>Valandos</th>
-                <th>Dezes</th>
+                <th>Dėžės</th>
                 <th>Atlygis</th>
                 <th>Veiksmai</th>
             </tr>
@@ -169,15 +169,15 @@
             </tbody>
         </table>
         <br />
-        <h2 align="center">Ikainiai</h2>
+        <h2 align="center">Įkainiai</h2>
         <br />
         <table id="ikainiuTable" class="table">
             <thead>
             <tr>
-                <th>Ikainio ID</th>
+                <th>Įkainio ID</th>
                 <th>Galioja Nuo</th>
                 <th>Valandinis</th>
-                <th>Deziu kiekis</th>
+                <th>Dėžių kiekis</th>
                 <th>Darbuotojai</th>
             </tr>
             </thead>
@@ -197,7 +197,7 @@
             </tbody>
         </table>
         <br />
-        <a class="btn btn-primary" href="/ikainis" >Naujas Ikainis</a>
+        <a class="btn btn-primary" href="/ikainis" >Naujas Įkainis</a>
         <br />
     {% endif %}
 {% endblock %}

@@ -20,6 +20,8 @@ class Darbuotojas(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     ataskaitos = db.relationship('DienosAtaskaita')
     # Kai ikainiu nera dabartinis_ikainis == null
+    # Idealiai čia turėtų būti many to many relationship, tuomet galėtų būti daug įkainių
+    # Kurie kiekvienas prasidėtų tam tikrą datą
     dabartinis_ikainis = db.Column(db.Float, db.ForeignKey('ikainis.id'))
 
 
