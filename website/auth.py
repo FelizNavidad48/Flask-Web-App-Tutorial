@@ -59,19 +59,21 @@ def sign_up():
             flash('Password must be at least 7 characters.', category='error')
         else:
             role = request.form.get('role')
-            new_user = User(email=email, first_name=first_name,
-                            password=sha256_crypt.encrypt(password1), role=role, patvirtinta=False)
-            db.session.add(new_user)
-            db.session.commit()
             if role == "darbuotojas":
-                new_darbuotojas = Darbuotojas(user_id=new_user.id)
-                db.session.add(new_darbuotojas)
+                new_user = Darbuotojas(email=email, first_name=first_name,
+                                password=sha256_crypt.encrypt(password1), role=role, patvirtinta=False)
+                db.session.add(new_user)
                 db.session.commit()
-            if role == 'administratorius':
-                new_user.patvirtinta = True
+            else:
+                new_user = User(email=email, first_name=first_name,
+                                password=sha256_crypt.encrypt(password1), role=role, patvirtinta=False)
+                db.session.add(new_user)
                 db.session.commit()
-                login_user(new_user, remember=True)
-                return redirect(url_for('views.home'))
+                if role == 'administratorius':
+                    new_user.patvirtinta = True
+                    db.session.commit()
+                    login_user(new_user, remember=True)
+                    return redirect(url_for('views.home'))
 
             flash('Paskyra sukurta, laukiama patvirtinimo', category='success')
             return redirect(url_for('auth.login'))

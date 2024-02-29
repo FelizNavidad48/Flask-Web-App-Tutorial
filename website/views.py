@@ -22,8 +22,7 @@ def home():
         return render_template("home.html", user=current_user,
                                darbuotojai=darbuotojai)
     elif current_user.role == "darbuotojas":
-        darbuotojo_id = Darbuotojas.query.filter_by(user_id=current_user.id).first().id
-        ataskaitos = DienosAtaskaita.query.filter_by(darbuotojo_id=darbuotojo_id).all()
+        ataskaitos = DienosAtaskaita.query.filter_by(darbuotojo_id=current_user.id).all()
         ataskaitu_skaicius = len(ataskaitos)
         valandos = 0
         dezes = 0
@@ -56,12 +55,28 @@ def dienos_ataiskaita():
             flash('Deziu kiekis negali buti maziau nei 0!', category='error')
         if int(atidirbtos_valandos) < 0:
             flash('Darbo valandu negali buti maziau nei 0!', category='error')
+        if current_user.role != "darbuotojas":
+            flash('Ataskaitas gali pildyti tik darbuotojas!', category='error')
         else:
+            darbuotojas = Darbuotojas.query.get(current_user.id)
             new_dienos_ataiskata = DienosAtaskaita(data=data, perkeltos_dezes=perkeltos_dezes,
                                                    atidirbtos_valandos=atidirbtos_valandos,
-                                                   darbuotojo_id=Darbuotojas.query
-                                                   .filter_by(user_id=current_user.id).first().id)
+                                                   darbuotojo_id=darbuotojas.id)
             db.session.add(new_dienos_ataiskata)
+            naujausias_ataskaitos_ikainis = None
+            darbuotojo_ikainiai = darbuotojas.ikainiai
+
+            darbuotojo_ikainiai.sort(key=lambda x: x.data, reverse=False)
+            print(darbuotojo_ikainiai)
+
+            for ikainis in darbuotojo_ikainiai:
+                if ikainis.data <= data:
+                    naujausias_ataskaitos_ikainis = ikainis
+
+            if naujausias_ataskaitos_ikainis:
+                new_dienos_ataiskata.atlygis = (float(new_dienos_ataiskata.atidirbtos_valandos) * naujausias_ataskaitos_ikainis.valandinis
+                                                + float(new_dienos_ataiskata.perkeltos_dezes) * naujausias_ataskaitos_ikainis.atlygis_uz_deze)
+
             db.session.commit()
             flash('Dienos ataskaita prideta!', category='success')
             return redirect(url_for('views.home'))
@@ -76,10 +91,6 @@ def patvirtinti_ataskaita():
     ataskaita = DienosAtaskaita.query.get(ataskaitosId)
     if ataskaita:
         ataskaita.patvirtinta = True
-        darbuotojas = Darbuotojas.query.get(ataskaita.darbuotojo_id)
-         # Veikia tik su naujausiu ikainiu, nepaisant to kad jis gali prasidėti veliau nei dabartinė data
-        if darbuotojas.dabartinis_ikainis:
-            atnaujinti_atlygi(darbuotojas, Ikainis.query.get(darbuotojas.dabartinis_ikainis))
         db.session.commit()
 
     return jsonify({})
@@ -138,24 +149,23 @@ def parsisiusti_pdf():
 def ikainis():
     if request.method == 'POST':
         data = request.form.get('data')
-        deziu_kiekis = request.form.get('deziu_kiekis')
+        atlygis_uz_deze = request.form.get('atlygis_uz_deze')
         valandinis = request.form.get('valandinis')
-        new_ikainis = Ikainis(data=data, valandinis=valandinis, deziu_kiekis=deziu_kiekis)
+        new_ikainis = Ikainis(data=data, valandinis=valandinis, atlygis_uz_deze=atlygis_uz_deze)
         db.session.add(new_ikainis)
         db.session.commit()
 
         darbuotojai = request.form.getlist('pasirinkti_darbuotojus')
         for darbuotojo_id in darbuotojai:
             darbuotojas = Darbuotojas.query.get(darbuotojo_id)
-            # Veikia tik su naujausiu ikainiu, nepaisant to kad jis gali prasidėti veliau nei dabartinė data
-            if (not darbuotojas.dabartinis_ikainis or Ikainis.query.get(darbuotojas.dabartinis_ikainis).data
-                    <= new_ikainis.data):
-                atnaujinti_atlygi(darbuotojas, new_ikainis)
+            darbuotojas.ikainiai.append(new_ikainis)
+            atnaujinti_atlygi(darbuotojas)
 
         flash('Ikainis pridetas!', category='success')
         return redirect(url_for('views.home'))
 
     darbuotojai = Darbuotojas.query.all()
+
     if current_user.role == "administratorius":
         return render_template("ikainis.html", user=current_user, darbuotojai=darbuotojai)
     else:
@@ -163,14 +173,16 @@ def ikainis():
         return redirect(url_for('views.home'))
 
 
-def atnaujinti_atlygi(darbuotojas, ikainis):
-    darbuotojas.dabartinis_ikainis = ikainis.id
-
+def atnaujinti_atlygi(darbuotojas):
     for ataskaita in darbuotojas.ataskaitos:
-        if ataskaita.data >= ikainis.data:
-            if ikainis.deziu_kiekis >= ataskaita.perkeltos_dezes:
-                ataskaita.atlygis = ataskaita.atidirbtos_valandos * ikainis.valandinis
-            else:
-                ataskaita.atlygis = ((ataskaita.atidirbtos_valandos / ataskaita.perkeltos_dezes) *
-                                     ikainis.deziu_kiekis * ikainis.valandinis)
+        if not ataskaita.patvirtinta:
+            # Suranda naujausia ikaini
+            naujausias_ataskaitos_ikainis = None
+            for ikainis in darbuotojas.ikainiai:
+                if ikainis.data <= ataskaita.data:
+                    naujausias_ataskaitos_ikainis = ikainis
+
+            if naujausias_ataskaitos_ikainis:
+                ataskaita.atlygis = (ataskaita.atidirbtos_valandos * naujausias_ataskaitos_ikainis.valandinis
+                                     + ataskaita.perkeltos_dezes * naujausias_ataskaitos_ikainis.atlygis_uz_deze)
     db.session.commit()

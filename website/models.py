@@ -1,9 +1,14 @@
 from . import db
 from flask_login import UserMixin
+from sqlalchemy import Table, Column, Integer, ForeignKey, Boolean
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
+
 from sqlalchemy.sql import func
 
 
-class User(db.Model, UserMixin):
+class User(db.Model, UserMixin, Base):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
@@ -14,15 +19,20 @@ class User(db.Model, UserMixin):
     user_darbuotojas_id = db.relationship('Darbuotojas')
 
 
+# Association Table
+ikainis_darbuotojas_asociacija = Table(
+    'ikainis_darbuotojas_asociacija', db.Model.metadata,
+    Column('ikainio_id', db.Integer, ForeignKey('ikainis.id')),
+    Column('darbuotojo_id', db.Integer, ForeignKey('darbuotojas.id')),
+
+)
+
+
 # Darbuotojas
-class Darbuotojas(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+class Darbuotojas(User):
+    id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     ataskaitos = db.relationship('DienosAtaskaita')
-    # Kai ikainiu nera dabartinis_ikainis == null
-    # Idealiai čia turėtų būti many to many relationship, tuomet galėtų būti daug įkainių
-    # Kurie kiekvienas prasidėtų tam tikrą datą
-    dabartinis_ikainis = db.Column(db.Float, db.ForeignKey('ikainis.id'))
+    ikainiai = db.relationship('Ikainis', secondary='ikainis_darbuotojas_asociacija', back_populates='darbuotojai')
 
 
 # Darbuotojo dienos ataskaita
@@ -46,5 +56,5 @@ class Ikainis(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.String(10))
     valandinis = db.Column(db.Float)
-    deziu_kiekis = db.Column(db.Integer)
-    darbuotojai = db.relationship('Darbuotojas')
+    atlygis_uz_deze = db.Column(db.Integer)
+    darbuotojai = db.relationship('Darbuotojas', secondary='ikainis_darbuotojas_asociacija', back_populates='ikainiai')

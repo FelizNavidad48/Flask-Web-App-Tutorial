@@ -7,20 +7,20 @@
         <label for="darbo_valandos">Valandinis</label>
         <input type="number" name="valandinis" step="0.01" class="form-control" value="0"></input>
         <br />
-        <label for="deziu_kiekis">Dėžių kiekis</label>
-        <input type="number" name="deziu_kiekis" id="deziu_kiekis" class="form-control" value=0></input>
+        <label for="deziu_kiekis">Atlygis uz perkelta deze</label>
+        <input type="number" name="atlygis_uz_deze" id="atlygis_uz_deze" class="form-control" value=0></input>
         <br />
         <label for="pasirinkti_darbuotojus">Pasirinkti darbuotojus</label>
         <br />
             <select class="form-select" style="width: 1130px" name="pasirinkti_darbuotojus" multiple>
                 {% for darbuotojas in darbuotojai %}
-                    <option value="{{darbuotojas.id}}">Id: {{ darbuotojas.id }}. {{darbuotojas.vardas}}</option>
+                    <option value="{{darbuotojas.id}}">{{ darbuotojas.id }} - {{ darbuotojas.first_name.capitalize() }}</option>
                 {% endfor %}
             </select>
         <br />
         <br />
         <div align="center">
-            <button type="submit" class="btn btn-primary">Pateikti Įaini</button>
+            <button type="submit" class="btn btn-primary">Pateikti Įkaini</button>
         </div>
     </form>
 {% endblock %}
