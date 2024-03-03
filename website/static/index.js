@@ -105,10 +105,10 @@ function menesiuFiltravimoFunkcija() {
   var input, filter, table, tr, td, i, txtValue;
   input = document.getElementById("monthInput");
   if (input == null || input.value === "") {
-    document.getElementById("parsisiustiPagalMenesi").disabled = true;
+    document.getElementById("parsisiustiPagalMenesi").href = "";
   }
   else{
-    document.getElementById("parsisiustiPagalMenesi").disabled = false;
+    document.getElementById("parsisiustiPagalMenesi").href = `/parsisiusti-pdf/${input.value.toString()}`;
   }
   filter = input.value.toUpperCase();
   table = document.getElementById("myTable");
@@ -128,9 +128,16 @@ function menesiuFiltravimoFunkcija() {
   }
 }
 
-function parsisiusti(ataskaitosId) {
-  fetch("/parsisiusti-pdf", {
+function parsisiustiMenesioAtaskaita() {
+  let menuo = document.getElementById("monthInput");
+  if (menuo == null || menuo.value === "") {
+    alert("Pasirinkite menesį");
+    return;
+  }
+  fetch(`/parsisiusti-pdf/${menuo.value.toString()}`, {
     method: "POST",
-    body: JSON.stringify({ ataskaitosId: ataskaitosId }),
-  })
+    body: JSON.stringify({ menuo: menuo.value }),
+  }).then(async (_res) => {
+    window.location.href = `/parsisiusti-pdf/${menuo.value.toString()}`;
+  });
 }

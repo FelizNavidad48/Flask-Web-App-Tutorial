@@ -1,14 +1,17 @@
-{% extends "base.html" %} {% block title %}Dienos Ataskaita{% endblock %} {% block content %}
-    <h1 align="center">Dienos Ataskaita</h1>
+{% extends "base.html" %} {% block title %}Menesio Ataskaita{% endblock %} {% block content %}
+    <h1 align="center">Menesio Ataskaita</h1>
     <form method="POST">
-        <label for="data">Data</label>
-        <input type="date" name="data" id="data" class="form-control" value="{{ ataskaita.data }}">
+        <label for="data">Menuo</label>
+        <input type="date" name="data" id="data" class="form-control" value="{{ menuo }}">
         <br />
         <label for="darbo_valandos">Darbo val.</label>
-        <input type="number" name="darbo_valandos" id="darbo_valandos" class="form-control" value="{{ ataskaita.atidirbtos_valandos }}"></input>
+        <input type="number" name="darbo_valandos" id="darbo_valandos" class="form-control" value="{{ atidirbtos_valandos }}"></input>
         <br />
-        <label for="deziu_kiekis">Dėžių kiekis</label>
-        <input type="number" name="deziu_kiekis" id="deziu_kiekis" class="form-control" value="{{ ataskaita.perkeltos_dezes }}"></input>
+        <label for="ismoketas_atlygis">Ismoketas atlygis</label>
+        <input type="number" name="ismoketas_atlygis" id="ismoketas_atlygis" class="form-control" value="{{ ismoketas_atlygis }}"></input>
+        <br />
+        <label for="deziu_kiekis">Perkeltu Dėžių kiekis</label>
+        <input type="number" name="deziu_kiekis" id="deziu_kiekis" class="form-control" value="{{ deziu_kiekis }}"></input>
         <br />
     </form>
 {% endblock %}

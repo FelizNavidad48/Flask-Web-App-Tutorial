@@ -54,7 +54,7 @@
         <label for="monthInput">Filtruoti pagal menesį:</label>
         <div style="display: flex; gap: 10px;">
             <input type="month" id="monthInput" onchange="menesiuFiltravimoFunkcija()" class="form-control">
-            <button id="parsisiustiPagalMenesi" class="btn btn-primary" disabled onclick="">Parsisiųsti</button>
+            <button id="parsisiustiPagalMenesi" class="btn btn-primary" onclick="parsisiustiMenesioAtaskaita()" >Parsisiųsti</>
         </div>
         </br>
         <table id="myTable" class="table">
@@ -89,7 +89,6 @@
                             {% else %}
                                 <sl-icon-button id="{{ 'redagavimo-mygtukas-{0:d}'.format(ataskaita.id) }}" name="pencil-square" onClick="redaguoti({{ ataskaita.id }})" label="Settings"></sl-icon-button>
                             {% endif %}
-                            <sl-icon-button name="download" onClick="parsisiusti({{ ataskaita.id }})" ></sl-icon-button>
                             </div>
                         </td>
                     </tr>
@@ -159,7 +158,6 @@
                                 <div style="display: flex; font-size: large">
                                     <sl-icon-button name="check-circle" style="color: green" label="Settings" disabled></sl-icon-button>
                                     <sl-icon-button id="{{ 'redagavimo-mygtukas-{0:d}'.format(ataskaita.id) }}" name="pencil-square" onClick="redaguoti({{ ataskaita.id }})" label="Settings"></sl-icon-button>
-                                    <sl-icon-button name="download" onClick="parsisiusti({{ ataskaita.id }})" ></sl-icon-button>
                                 </div>
                             </td>
                         </tr>

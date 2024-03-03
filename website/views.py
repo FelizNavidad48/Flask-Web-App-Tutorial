@@ -1,6 +1,9 @@
 import time
 
 import pdfkit
+from os.path import join, dirname, realpath
+
+
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for, make_response, Response, \
     send_file, send_from_directory
 from flask_login import login_required, current_user
@@ -74,8 +77,10 @@ def dienos_ataiskaita():
                     naujausias_ataskaitos_ikainis = ikainis
 
             if naujausias_ataskaitos_ikainis:
-                new_dienos_ataiskata.atlygis = (float(new_dienos_ataiskata.atidirbtos_valandos) * naujausias_ataskaitos_ikainis.valandinis
-                                                + float(new_dienos_ataiskata.perkeltos_dezes) * naujausias_ataskaitos_ikainis.atlygis_uz_deze)
+                new_dienos_ataiskata.atlygis = (
+                        float(new_dienos_ataiskata.atidirbtos_valandos) * naujausias_ataskaitos_ikainis.valandinis
+                        + float(
+                    new_dienos_ataiskata.perkeltos_dezes) * naujausias_ataskaitos_ikainis.atlygis_uz_deze)
 
             db.session.commit()
             flash('Dienos ataskaita prideta!', category='success')
@@ -133,15 +138,28 @@ def redaguoti():
     return jsonify({})
 
 
-@views.route('/parsisiusti-pdf', methods=['GET', 'POST'])
-def parsisiusti_pdf():
-    atsiustiDuomenys = json.loads(request.data)  # this function expects a JSON from the INDEX.js file
-    ataskaitosId = atsiustiDuomenys['ataskaitosId']
-    ataskaita = DienosAtaskaita.query.get(ataskaitosId)
-    html_content = render_template('pdf_ataskaita.html', user=current_user, ataskaita=ataskaita)
+@views.route('/parsisiusti-pdf/<menuo>', methods=['GET', 'POST'])
+def parsisiusti_pdf(menuo):
+    path = join(dirname(realpath(__file__)), 'download_folder/pdf_ataskaita_' + str(menuo) + '.pdf')
+    if request.method == 'POST':
+        ataskaitos = DienosAtaskaita.query.all()
+        atidirbtos_valandos = 0
+        ismoketas_atlygis = 0
+        deziu_kiekis = 0
+        for ataskaita in ataskaitos:
+            if ataskaita.patvirtinta and ataskaita.data[:-3] == str(menuo):
+                atidirbtos_valandos += ataskaita.atidirbtos_valandos
+                ismoketas_atlygis += ataskaita.atlygis
+                deziu_kiekis += ataskaita.perkeltos_dezes
 
-    pdf = pdfkit.from_string(html_content, "download_folder/pdf_ataskaita_" + str(ataskaita.id) + ".pdf")
-    return send_from_directory("download_folder", "pdf_ataskaita_" + str(ataskaita.id) + ".pdf", as_attachment=True)
+        html_content = render_template('pdf_ataskaita.html', user=current_user, menuo=menuo,
+                                       atidirbtos_valandos=atidirbtos_valandos, ismoketas_atlygis=ismoketas_atlygis,
+                                       deziu_kiekis=deziu_kiekis)
+
+        pdfkit.from_string(html_content, path)
+        return jsonify({})
+    else:
+        return send_file(path, as_attachment=True)
 
 
 @views.route('/ikainis', methods=['GET', 'POST'])

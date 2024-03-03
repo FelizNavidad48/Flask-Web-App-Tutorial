@@ -25,6 +25,8 @@ ikainis_darbuotojas_asociacija = Table(
     Column('ikainio_id', db.Integer, ForeignKey('ikainis.id')),
     Column('darbuotojo_id', db.Integer, ForeignKey('darbuotojas.id')),
 
+
+
 )
 
 
