@@ -3,7 +3,6 @@ import time
 import pdfkit
 from os.path import join, dirname, realpath
 
-
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for, make_response, Response, \
     send_file, send_from_directory
 from flask_login import login_required, current_user
@@ -138,11 +137,18 @@ def redaguoti():
     return jsonify({})
 
 
-@views.route('/parsisiusti-pdf/<menuo>', methods=['GET', 'POST'])
-def parsisiusti_pdf(menuo):
-    path = join(dirname(realpath(__file__)), 'download_folder/pdf_ataskaita_' + str(menuo) + '.pdf')
+@views.route('/parsisiusti-pdf/<menuo>/<darbuotojoId>', methods=['GET', 'POST'])
+def parsisiusti_pdf(menuo, darbuotojoId):
+    path = join(dirname(realpath(__file__)), 'download_folder/pdf_ataskaita_' + str(menuo) + "_"
+                + str(darbuotojoId) + '.pdf')
     if request.method == 'POST':
-        ataskaitos = DienosAtaskaita.query.all()
+        if darbuotojoId is None:
+            ataskaitos = DienosAtaskaita.query.all()
+            darbuotojo_vardas = ""
+        else:
+            ataskaitos = DienosAtaskaita.query.filter_by(darbuotojo_id=darbuotojoId).all()
+            darbuotojo_vardas = Darbuotojas.query.get(darbuotojoId).first_name
+
         atidirbtos_valandos = 0
         ismoketas_atlygis = 0
         deziu_kiekis = 0
@@ -154,7 +160,8 @@ def parsisiusti_pdf(menuo):
 
         html_content = render_template('pdf_ataskaita.html', user=current_user, menuo=menuo,
                                        atidirbtos_valandos=atidirbtos_valandos, ismoketas_atlygis=ismoketas_atlygis,
-                                       deziu_kiekis=deziu_kiekis)
+                                       deziu_kiekis=deziu_kiekis, ataskaitos=ataskaitos,
+                                       darbuotojo_vardas=darbuotojo_vardas)
 
         pdfkit.from_string(html_content, path)
         return jsonify({})

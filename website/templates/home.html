@@ -49,11 +49,11 @@
         <h1 align="center">Vadybininko puslapis</h1>
         </br>
         <label for="idInput">Filtruoti pagal darbuotojo Id:</label>
-        <input type="text" id="idInput" class="form-control" onblur="idFiltravimoFunkcija()" placeholder="Darbuotojo Id..">
+        <input type="text" id="idInput" class="form-control" onblur="filtravimoFunkcija()" onchange="filtravimoFunkcija()" placeholder="Darbuotojo Id..">
         </br>
         <label for="monthInput">Filtruoti pagal menesį:</label>
         <div style="display: flex; gap: 10px;">
-            <input type="month" id="monthInput" onchange="menesiuFiltravimoFunkcija()" class="form-control">
+            <input type="month" id="monthInput" onchange="filtravimoFunkcija()" class="form-control">
             <button id="parsisiustiPagalMenesi" class="btn btn-primary" onclick="parsisiustiMenesioAtaskaita()" >Parsisiųsti</>
         </div>
         </br>

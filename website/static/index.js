@@ -100,29 +100,45 @@ function idFiltravimoFunkcija() {
   }
 }
 
-function menesiuFiltravimoFunkcija() {
+function filtravimoFunkcija() {
   // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("monthInput");
-  if (input == null || input.value === "") {
-    document.getElementById("parsisiustiPagalMenesi").href = "";
-  }
-  else{
-    document.getElementById("parsisiustiPagalMenesi").href = `/parsisiusti-pdf/${input.value.toString()}`;
-  }
-  filter = input.value.toUpperCase();
+  let monthInput, idInput, filter, table, tr, td, i, txtValue;
+  monthInput = document.getElementById("monthInput");
+  idInput = document.getElementById("idInput");
+  let monthFilter = monthInput.value.toUpperCase();
+  let idFilter = idInput.value.toUpperCase();
   table = document.getElementById("myTable");
   tr = table.getElementsByTagName("tr");
 
   // Loop through all table rows, and hide those who don't match the search query
+  let tdId;
+  let tdMonth;
+  let txtValueId;
+  let txtValueMonth;
   for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[1];
-    if (td) {
-      txtValue = td.getElementsByTagName("input")[0].value;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
+    tdMonth = tr[i].getElementsByTagName("td")[1];
+    tdId = tr[i].getElementsByTagName("td")[0];
+    if (tdMonth || tdId) {
+      txtValueMonth = tdMonth.getElementsByTagName("input")[0].value;
+      txtValueId = tdId.getElementsByTagName("input")[0].value;
+      if (monthFilter !== "" && idFilter !== "") {
+        if (txtValueMonth.toUpperCase().indexOf(monthFilter) > -1 && txtValueId.toUpperCase().indexOf(idFilter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      } else if(monthFilter !== "" && idFilter === "") {
+        if (txtValueMonth.toUpperCase().indexOf(monthFilter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      } else if(monthFilter === "" && idFilter !== "") {
+        if(txtValueId.toUpperCase().indexOf(idFilter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
       }
     }
   }
@@ -134,10 +150,11 @@ function parsisiustiMenesioAtaskaita() {
     alert("Pasirinkite menesį");
     return;
   }
-  fetch(`/parsisiusti-pdf/${menuo.value.toString()}`, {
+  let darbuotojoId = document.getElementById("idInput");
+  fetch(`/parsisiusti-pdf/${menuo.value.toString()}/${darbuotojoId.value.toString()}`, {
     method: "POST",
     body: JSON.stringify({ menuo: menuo.value }),
   }).then(async (_res) => {
-    window.location.href = `/parsisiusti-pdf/${menuo.value.toString()}`;
+    window.location.href = `/parsisiusti-pdf/${menuo.value.toString()}/${darbuotojoId.value.toString()}`;
   });
 }
